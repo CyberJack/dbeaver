@@ -22,17 +22,19 @@ Currently only the following database engines can be detected:
 To install this addon globally, clone this repository inside the `$HOME/.docksal/addons` directory.
 
 ```bash
-cd $HOME/.docksal/addons
-git clone git@github.com:CyberJack/dbeaver.git
+mkdir -p $HOME/.docksal/addons
+git clone git@github.com:CyberJack/dbeaver.git $HOME/.docksal/addons/dbeaver
 ```
 
 ### Inside a single project
 
 To install this addon inside a single project, clone this repository inside the `.docksal/addons` directory within the project. 
 
+From the root of the project run:
+
 ```bash
-cd .docksal/addons
-git clone git@github.com:CyberJack/dbeaver.git
+mkdir -p .docksal/addons
+git clone git@github.com:CyberJack/dbeaver.git .docksal/addons/dbeaver
 ```
 
 ## Usage
@@ -59,3 +61,4 @@ For major changes, please open an issue first to discuss what you would like to 
 [1]: https://dbeaver.io
 [2]: https://docksal.io
 [3]: https://www.shellcheck.net
+
