@@ -18,7 +18,7 @@ error() {
 function detectDBeaver() {
     case "${OSTYPE}" in
       darwin*)
-          DBEAVER="/Applications/DBeaver.app/Contents/MacOS/dbeaver"
+          DBEAVER="$(osascript -e 'POSIX path of (path to application "DBeaver")')Contents/MacOS/dbeaver"
           ;;
       linux*)
           DBEAVER=$(command -v dbeaver)
@@ -30,7 +30,7 @@ function detectDBeaver() {
     esac
 
     if [[ ! -f "${DBEAVER}" ]]; then
-        error "Error: DBeaver is not installed ${OS_STR}."
+        error "Error: DBeaver is not installed ${OSTYPE}."
         if [[ "${OSTYPE}" == darwin* ]]; then
             echo
             echo "Install DBeaver with brew:"
@@ -57,12 +57,12 @@ function detectDatabaseType() {
     local ENV_SETTINGS
     ENV_SETTINGS=$(docker inspect -f '{{range $index, $value := .Config.Env}}{{println $value}}{{end}}' "${CONTAINER_ID}")
 
-    local ENV_SPLITTED
+    local ENV_SPLIT
     # shellcheck disable=SC2206
-    IFS=$'\n' ENV_SPLITTED=($ENV_SETTINGS)
+    IFS=$'\n' ENV_SPLIT=($ENV_SETTINGS)
 
     local KEY
-    for VALUE in "${ENV_SPLITTED[@]}"
+    for VALUE in "${ENV_SPLIT[@]}"
     do
         KEY=$(echo "${VALUE}" | cut -d '=' -f1)
 
