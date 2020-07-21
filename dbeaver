@@ -11,6 +11,10 @@ info() {
     echo -e "\033[0;32m${1}\033[0m"
 }
 
+error() {
+    echo -e "\033[1;31m${1}\033[0m"
+}
+
 function detectDBeaver() {
     case "${OSTYPE}" in
       darwin*)
@@ -26,7 +30,7 @@ function detectDBeaver() {
     esac
 
     if [[ ! -f "${DBEAVER}" ]]; then
-        echo -e "\033[1;31mError: DBeaver is not installed ${OSTYPE}.\033[0m"
+        error "Error: DBeaver is not installed ${OS_STR}."
         if [[ "${OSTYPE}" == darwin* ]]; then
             echo
             echo "Install DBeaver with brew:"
@@ -40,7 +44,7 @@ function detectDBeaver() {
 function getContainerId() {
     CONTAINER_ID=$(docker ps --all --filter "label=com.docker.compose.service=${DB_SERVICE}" --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME_SAFE}" --format '{{.ID}}')
     if [ -z "${CONTAINER_ID}" ]; then
-        info "Error: Unable to detect database container with name \"${DB_SERVICE}\"."
+        error "Error: Unable to detect database container with name \"${DB_SERVICE}\"."
         exit 1
     fi
 }
@@ -88,12 +92,12 @@ detectContainerPort
 detectDatabaseType
 
 if [[ -z "${DB_TYPE}" ]]; then
-    info "Error: Unable to detect database engine used inside the db container."
+    error "Error: Unable to detect database engine used inside the db container."
     exit 1
 fi
 
 if [[ -z "${CONTAINER_PORT}" ]]; then
-    info "Error: Unable to detect database mapped port."
+    error "Error: Unable to detect database mapped port."
     exit 1
 fi
 
