@@ -11,23 +11,29 @@ info() {
     echo -e "\033[0;32m${1}\033[0m"
 }
 
+error() {
+    echo -e "\033[1;31m${1}\033[0m"
+}
+
 function detectDBeaver() {
-    case "${OSTYPE}" in
-      darwin*)
-          DBEAVER="/Applications/DBeaver.app/Contents/MacOS/dbeaver"
-          ;;
-      linux*)
-          DBEAVER=$(command -v dbeaver)
-          ;;
-      *)
-          echo "Unknown system: ${OSTYPE} is currently not supported!"
-          exit 1
-          ;;
+    local OS
+    OS=$(uname | tr '[:upper:]' '[:lower:]')
+    case $OS in
+        linux*)
+            DBEAVER=$(command -v dbeaver)
+            ;;
+        darwin*)
+            DBEAVER="$(osascript -e 'POSIX path of (path to application "DBeaver")')Contents/MacOS/dbeaver"
+            ;;
+        *)
+            echo "Unknown system: ${OS} is currently not supported!"
+            exit 1
+            ;;
     esac
 
     if [[ ! -f "${DBEAVER}" ]]; then
-        echo -e "\033[1;31mError: DBeaver is not installed ${OSTYPE}.\033[0m"
-        if [[ "${OSTYPE}" == darwin* ]]; then
+        error "Error: DBeaver is not installed."
+        if [[ "${OS}" == darwin* ]]; then
             echo
             echo "Install DBeaver with brew:"
             echo
@@ -40,7 +46,7 @@ function detectDBeaver() {
 function getContainerId() {
     CONTAINER_ID=$(docker ps --all --filter "label=com.docker.compose.service=${DB_SERVICE}" --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME_SAFE}" --format '{{.ID}}')
     if [ -z "${CONTAINER_ID}" ]; then
-        info "Error: Unable to detect database container with name \"${DB_SERVICE}\"."
+        error "Error: Unable to detect database container with name \"${DB_SERVICE}\"."
         exit 1
     fi
 }
@@ -53,12 +59,12 @@ function detectDatabaseType() {
     local ENV_SETTINGS
     ENV_SETTINGS=$(docker inspect -f '{{range $index, $value := .Config.Env}}{{println $value}}{{end}}' "${CONTAINER_ID}")
 
-    local ENV_SPLITTED
+    local ENV_SPLIT
     # shellcheck disable=SC2206
-    IFS=$'\n' ENV_SPLITTED=($ENV_SETTINGS)
+    IFS=$'\n' ENV_SPLIT=($ENV_SETTINGS)
 
     local KEY
-    for VALUE in "${ENV_SPLITTED[@]}"
+    for VALUE in "${ENV_SPLIT[@]}"
     do
         KEY=$(echo "${VALUE}" | cut -d '=' -f1)
 
@@ -88,12 +94,12 @@ detectContainerPort
 detectDatabaseType
 
 if [[ -z "${DB_TYPE}" ]]; then
-    info "Error: Unable to detect database engine used inside the db container."
+    error "Error: Unable to detect database engine used inside the db container."
     exit 1
 fi
 
 if [[ -z "${CONTAINER_PORT}" ]]; then
-    info "Error: Unable to detect database mapped port."
+    error "Error: Unable to detect database mapped port."
     exit 1
 fi
 
