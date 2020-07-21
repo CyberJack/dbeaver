@@ -16,22 +16,24 @@ error() {
 }
 
 function detectDBeaver() {
-    case "${OSTYPE}" in
-      darwin*)
-          DBEAVER="$(osascript -e 'POSIX path of (path to application "DBeaver")')Contents/MacOS/dbeaver"
-          ;;
-      linux*)
-          DBEAVER=$(command -v dbeaver)
-          ;;
-      *)
-          echo "Unknown system: ${OSTYPE} is currently not supported!"
-          exit 1
-          ;;
+    local OS
+    OS=$(uname | tr '[:upper:]' '[:lower:]')
+    case $OS in
+        linux*)
+            DBEAVER=$(command -v dbeaver)
+            ;;
+        darwin*)
+            DBEAVER="$(osascript -e 'POSIX path of (path to application "DBeaver")')Contents/MacOS/dbeaver"
+            ;;
+        *)
+            echo "Unknown system: ${OS} is currently not supported!"
+            exit 1
+            ;;
     esac
 
     if [[ ! -f "${DBEAVER}" ]]; then
-        error "Error: DBeaver is not installed ${OSTYPE}."
-        if [[ "${OSTYPE}" == darwin* ]]; then
+        error "Error: DBeaver is not installed."
+        if [[ "${OS}" == darwin* ]]; then
             echo
             echo "Install DBeaver with brew:"
             echo
