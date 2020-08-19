@@ -1,5 +1,8 @@
 # DBeaver Docksal addon
 
+**NOTE: This repository is no longer maintained!  
+The dbeaver script is now part of the [docksal addons repository](https://github.com/docksal/addons).**
+
 This Docksal addon launches [DBeaver][1] with the connection information from the current project.
 DBeaver is a multi-platform database tool which supports popular database engines like MySQL, PostgreSQL, SQLite and more. 
 
